@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pinyin Panda - P1 Chinese Learning</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Andika&family=Nunito:wght@400;700;900&family=Zcool+KuaiLe&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Nunito', sans-serif;
+        background-color: #FFFBEB;
+        user-select: none;
+    }
+    .chinese-font { font-family: 'Zcool KuaiLe', cursive; }
+    .pinyin-font { font-family: 'Andika', sans-serif; }
+
+    .card-shadow {
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        transition: all 0.1s;
+    }
+    .card-shadow:active {
+        transform: translateY(4px);
+        box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+
+    /* --- PANDA FACE CSS --- */
+    .panda-wrapper {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        margin: 0 auto;
+    }
+    
+    .ear {
+        width: 70px;
+        height: 70px;
+        background: #333;
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        z-index: 0; 
+    }
+    .ear.left { left: 10px; }
+    .ear.right { right: 10px; }
+
+    .panda-face {
+        width: 200px;
+        height: 200px;
+        background: white;
+        border: 8px solid #333;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 0;
+        left: 10px;
+        z-index: 10;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden; 
+    }
+
+    .eye {
+        width: 50px;
+        height: 50px;
+        background: #333;
+        border-radius: 50% 50% 40% 40%;
+        position: absolute;
+        top: 40px; 
+    }
+    .eye.left { left: 35px; transform: rotate(20deg); }
+    .eye.right { right: 35px; transform: rotate(-20deg); }
+    .eye::after {
+        content: '';
+        width: 15px;
+        height: 15px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        left: 12px;
+    }
+
+    .nose {
+        width: 30px;
+        height: 20px;
+        background: #333;
+        border-radius: 40%;
+        position: absolute;
+        top: 100px; 
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+    }
+    
+    .nose.vibrate { animation: nose-buzz 0.5s infinite; }
+    @keyframes nose-buzz {
+        0% { transform: translateX(-50%) rotate(0deg) scale(1); }
+        25% { transform: translateX(-52%) rotate(-5deg) scale(1.1); }
+        50% { transform: translateX(-48%) rotate(5deg) scale(1.1); }
+        75% { transform: translateX(-52%) rotate(-5deg) scale(1.1); }
+        100% { transform: translateX(-50%) rotate(0deg) scale(1); }
+    }
+
+    .mouth {
+        background: #FF9999;
+        border: 4px solid #333;
+        position: absolute;
+        top: 135px; 
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        width: 30px;
+        height: 10px;
+        transition: all 0.2s ease;
+        overflow: hidden; 
+        z-index: 15;
+    }
+
+    /* TEETH */
+    .mouth::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 15%;
+        width: 70%;
+        height: 0px;
+        background: white;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+        transition: height 0.1s;
+        z-index: 2;
+    }
+    .mouth::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #DDD;
+        opacity: 0;
+        z-index: 2;
+    }
+
+    /* TONGUE */
+    .tongue {
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 20px;
+        background: #FF5555;
+        border-radius: 15px 15px 0 0;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    /* PAPER TEST */
+    .paper-test {
+        position: absolute;
+        top: 130px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid #CCC;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        transform-origin: top center;
+        z-index: 30; 
+        pointer-events: none;
+    }
+    .paper-test.blow { animation: blow-paper-loop 1s infinite; }
+    @keyframes blow-paper-loop {
+        0% { transform: translateX(-50%) rotateX(0deg); }
+        25% { transform: translateX(-50%) rotateX(-80deg) translateY(-25px); } 
+        50% { transform: translateX(-50%) rotateX(-40deg) translateY(-10px); }
+        75% { transform: translateX(-50%) rotateX(-70deg) translateY(-20px); }
+        100% { transform: translateX(-50%) rotateX(0deg); }
+    }
+
+    /* MOUTH ANIMATIONS */
+    .mouth.anim-a { animation: open-a 2s infinite; }
+    @keyframes open-a { 0%,100% { height:10px; width:35px; border-radius: 10px; } 50% { height:40px; width:35px; border-radius: 10px 10px 30% 30%; } }
+    .mouth.anim-o { animation: open-o 2s infinite; }
+    @keyframes open-o { 0%,100% { width:20px; height:20px; } 50% { width:45px; height:45px; border-radius:50%; border-width:6px;} }
+    .mouth.anim-e { animation: open-e 2s infinite; }
+    .mouth.anim-e::before { height: 35%; } 
+    @keyframes open-e { 0%,100% { width:30px; height:10px; } 50% { width:80px; height:30px; border-radius:15px; } }
+    .mouth.anim-i { animation: open-i 2s infinite; }
+    .mouth.anim-i { background: white; } 
+    .mouth.anim-i::after { opacity: 1; }
+    @keyframes open-i { 0%,100% { width:30px; height:10px; } 50% { width:90px; height:22px; border-radius:10px; } }
+    .mouth.anim-u { animation: open-u 2s infinite; }
+    @keyframes open-u { 0%,100% { width:30px; height:20px; } 50% { width:20px; height:20px; border-width:6px; } }
+    .mouth.anim-lips { animation: pop-lips 1s infinite; }
+    @keyframes pop-lips { 0% { width:40px; height:5px; background:#333; } 50% { width:40px; height:20px; background:#FF9999; } 100% { width:40px; height:20px; } }
+    .mouth.anim-open-slight { height: 25px; width: 40px; border-radius: 20px; } 
+
+    /* TONGUE POSITIONS */
+    .tongue.tongue-a { bottom: -25px; } 
+    .tongue.tongue-o { bottom: -5px; width: 18px; height: 18px; }
+    .tongue.tongue-e { bottom: -2px; width: 22px; }
+    .tongue.tongue-i { bottom: 0px; width: 24px; height: 22px; background: #FF6666; }
+    .tongue.tongue-u { bottom: -20px; width: 16px; } 
+    .tongue.tongue-ü { bottom: 2px; width: 14px; height: 18px; }
+    .tongue.anim-tip { animation: tongue-tap 1s infinite; height: 20px; }
+    @keyframes tongue-tap { 0%, 100% { bottom: -5px; } 50% { bottom: 10px; height: 22px; } }
+    .tongue.anim-curl { animation: tongue-curl 1s infinite; }
+    @keyframes tongue-curl { 0%, 100% { bottom: -5px; } 50% { bottom: 5px; width: 12px; height: 12px; border-radius: 50%; } }
+    .tongue.anim-back { animation: tongue-back 1s infinite; }
+    @keyframes tongue-back { 0%, 100% { width: 16px; bottom:-10px; } 50% { width: 24px; bottom: -2px; } }
+
+    /* DRAWING BOARD */
+    #drawing-board {
+        background-color: white;
+        cursor: crosshair;
+        touch-action: none;
+        border-radius: 1.5rem;
+        box-shadow: inset 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    /* Modal */
+    .modal-enter { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
+    }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-white p-4 sticky top-0 z-50 shadow-md border-b-4 border-orange-200">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2" onclick="showSection('home')">
+                <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white text-2xl cursor-pointer">🐼</div>
+                <span class="font-bold text-xl text-orange-600 cursor-pointer hidden sm:block">Pinyin Panda</span>
+            </div>
+            <div class="flex gap-2 sm:gap-4 overflow-x-auto pb-1">
+                <button onclick="showSection('tones')" class="px-3 py-2 rounded-xl bg-blue-100 text-blue-700 font-bold hover:bg-blue-200 text-sm transition whitespace-nowrap">1. 四声 (Tones)</button>
+                <button onclick="showSection('finals')" class="px-3 py-2 rounded-xl bg-green-100 text-green-700 font-bold hover:bg-green-200 text-sm transition whitespace-nowrap">2. 韵母 (Finals)</button>
+                <button onclick="showSection('initials')" class="px-3 py-2 rounded-xl bg-purple-100 text-purple-700 font-bold hover:bg-purple-200 text-sm transition whitespace-nowrap">3. 声母 (Initials)</button>
+                <button onclick="showSection('songs')" class="px-3 py-2 rounded-xl bg-pink-100 text-pink-700 font-bold hover:bg-pink-200 text-sm transition whitespace-nowrap">Songs 🎤</button>
+                <button onclick="showSection('draw')" class="px-3 py-2 rounded-xl bg-yellow-100 text-yellow-700 font-bold hover:bg-yellow-200 text-sm transition whitespace-nowrap">Draw 🎨</button>
+                <button onclick="showSection('magic')" class="px-3 py-2 rounded-xl bg-indigo-100 text-indigo-700 font-bold hover:bg-indigo-200 text-sm transition border-2 border-indigo-300 whitespace-nowrap">AI Fun ✨</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-4xl mx-auto w-full p-4 sm:p-6 relative">
+
+        <!-- HOME -->
+        <div id="home" class="section text-center py-10">
+            <h1 class="text-5xl font-extrabold text-orange-500 mb-4 chinese-font">Hello! 你好!</h1>
+            <p class="text-gray-600 mb-8 text-lg">Let's learn accurate Pinyin pronunciation!</p>
+            <div class="bg-white p-8 rounded-3xl shadow-lg border-4 border-orange-100 max-w-md mx-auto">
+                <div class="text-7xl mb-4 animate-bounce">🐼</div>
+                <button onclick="showSection('tones')" class="w-full py-4 bg-orange-500 text-white text-xl font-bold rounded-2xl card-shadow hover:bg-orange-600">Start Learning 🚀</button>
+            </div>
+        </div>
+
+        <!-- TONES (MP3s + Switcher + Rule) -->
+        <div id="tones" class="section hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-blue-600 mb-2">The 4 Tones (四声)</h2>
+                <p class="text-gray-500">Pick a letter and watch Panda drive!</p>
+            </div>
+            
+            <!-- VOWEL SWITCHER -->
+            <div class="flex justify-center flex-wrap gap-2 mb-8">
+                <button onclick="renderToneCards('a')" class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 font-bold text-xl hover:bg-blue-300 border-2 border-blue-200 transition focus:ring-4 ring-blue-200 pinyin-font">a</button>
+                <button onclick="renderToneCards('o')" class="w-12 h-12 rounded-full bg-green-100 text-green-600 font-bold text-xl hover:bg-green-300 border-2 border-green-200 transition focus:ring-4 ring-green-200 pinyin-font">o</button>
+                <button onclick="renderToneCards('e')" class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-600 font-bold text-xl hover:bg-yellow-300 border-2 border-yellow-200 transition focus:ring-4 ring-yellow-200 pinyin-font">e</button>
+                <button onclick="renderToneCards('i')" class="w-12 h-12 rounded-full bg-red-100 text-red-600 font-bold text-xl hover:bg-red-300 border-2 border-red-200 transition focus:ring-4 ring-red-200 pinyin-font">i</button>
+                <button onclick="renderToneCards('u')" class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 font-bold text-xl hover:bg-purple-300 border-2 border-purple-200 transition focus:ring-4 ring-purple-200 pinyin-font">u</button>
+                <button onclick="renderToneCards('ü')" class="w-12 h-12 rounded-full bg-pink-100 text-pink-600 font-bold text-xl hover:bg-pink-300 border-2 border-pink-200 transition focus:ring-4 ring-pink-200 pinyin-font">ü</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="tones-container">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- Tone Rule Button -->
+            <div class="mt-12 text-center">
+                <button onclick="document.getElementById('rule-modal').classList.remove('hidden')" class="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-full hover:bg-gray-200 border-2 border-gray-300 flex items-center gap-2 mx-auto">
+                    🧢 How to mark Tones? (Rules)
+                </button>
+            </div>
+        </div>
+
+        <!-- FINALS -->
+        <div id="finals" class="section hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-green-600 mb-2">Finals (韵母)</h2>
+                <p class="text-gray-500">Click a letter to see Panda's mouth & tongue!</p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4" id="finals-grid"></div>
+        </div>
+
+        <!-- INITIALS -->
+        <div id="initials" class="section hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-purple-600 mb-2">Initials (声母)</h2>
+                <p class="text-gray-500">Click to see the <b>Paper Test</b> (Song Qi)!</p>
+            </div>
+            <div class="space-y-8" id="initials-container"></div>
+        </div>
+
+        <!-- SONGS -->
+        <div id="songs" class="section hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-pink-600 mb-2">Pinyin Songs 🎤</h2>
+                <p class="text-gray-500">Sing along to learn faster!</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-4 rounded-3xl shadow-lg border-4 border-pink-200">
+                    <div class="mb-4 rounded-xl overflow-hidden bg-black h-64">
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/b9AyvjQCN7A" title="Pinyin Song" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <h3 class="font-bold text-gray-700 text-center">Pinyin Song (bpmf)</h3>
+                </div>
+                <div class="bg-white p-4 rounded-3xl shadow-lg border-4 border-pink-200">
+                    <div class="mb-4 rounded-xl overflow-hidden bg-black h-64">
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/v9Z332w3eE0" title="Tones Song" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <h3 class="font-bold text-gray-700 text-center">Four Tones Song</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRAW & GUESS -->
+        <div id="draw" class="section hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-yellow-600 mb-2">Draw & Guess (画一画) ✨</h2>
+                <p class="text-gray-500">Draw something and I will guess what it is!</p>
+            </div>
+            <div class="max-w-xl mx-auto bg-white p-4 rounded-3xl shadow-lg border-4 border-yellow-200">
+                <div class="relative w-full h-80 bg-gray-50 rounded-3xl border-2 border-dashed border-yellow-300 flex items-center justify-center overflow-hidden mb-4">
+                    <canvas id="drawing-board" class="w-full h-full"></canvas>
+                    <div id="draw-placeholder" class="absolute pointer-events-none text-gray-300 text-center">
+                        <span class="text-4xl">🖍️</span>
+                        <p class="font-bold">Draw here!</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 mb-4">
+                    <button onclick="clearCanvas()" class="flex-1 py-3 bg-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-300 transition">🗑️ Clear</button>
+                    <button onclick="guessDrawing()" id="btn-guess" class="flex-1 py-3 bg-yellow-500 text-white font-bold rounded-xl card-shadow hover:bg-yellow-600 transition flex justify-center items-center gap-2"><span>🤔 Guess!</span></button>
+                </div>
+                <div id="draw-loading" class="hidden text-center py-4">
+                    <div class="text-4xl animate-spin inline-block">🐼</div>
+                    <p class="text-yellow-600 font-bold">Panda is looking...</p>
+                </div>
+                <div id="draw-result" class="hidden border-t-2 border-gray-100 pt-4 text-center">
+                    <p class="text-gray-400 font-bold text-sm uppercase tracking-wide mb-1">I think it is...</p>
+                    <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 inline-block min-w-[200px] cursor-pointer hover:bg-yellow-100 transition" onclick="speakDrawResult()">
+                        <div id="draw-hanzi" class="text-5xl font-extrabold text-gray-800 mb-1 chinese-font"></div>
+                        <div id="draw-pinyin" class="text-2xl text-yellow-700 font-bold pinyin-font"></div>
+                        <div id="draw-english" class="text-sm text-gray-500 font-bold mt-1"></div>
+                        <div class="mt-2 text-yellow-500 text-xs font-bold">🔊 Click to Hear</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI FUN -->
+        <div id="magic" class="section hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-indigo-600 mb-2">AI Fun with Gemini ✨</h2>
+                <p class="text-gray-500">Make words or funny sentences!</p>
+            </div>
+            <div class="max-w-xl mx-auto bg-white p-6 rounded-3xl shadow-lg border-4 border-indigo-100">
+                <div class="flex justify-center gap-4 mb-6">
+                    <button onclick="setMode('word')" id="btn-word" class="px-4 py-2 rounded-full bg-indigo-500 text-white font-bold transition">One Word</button>
+                    <button onclick="setMode('sentence')" id="btn-sentence" class="px-4 py-2 rounded-full bg-gray-200 text-gray-600 font-bold transition">Funny Sentence</button>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-indigo-700 font-bold mb-2">Initial</label>
+                        <select id="magic-initial" class="w-full p-3 rounded-xl border-2 border-indigo-200 text-xl font-bold bg-indigo-50 pinyin-font"></select>
+                    </div>
+                    <div>
+                        <label class="block text-green-700 font-bold mb-2">Final</label>
+                        <select id="magic-final" class="w-full p-3 rounded-xl border-2 border-green-200 text-xl font-bold bg-green-50 pinyin-font"></select>
+                    </div>
+                </div>
+                <button onclick="generateMagic()" id="magic-btn" class="w-full py-4 bg-indigo-500 text-white text-xl font-bold rounded-2xl card-shadow hover:bg-indigo-600">
+                    <span id="btn-text">Make Word ✨</span>
+                </button>
+                <div id="magic-loading" class="hidden mt-6 text-center">
+                    <div class="text-4xl animate-spin inline-block">🐼</div>
+                    <p class="text-indigo-500 font-bold">Panda is thinking...</p>
+                </div>
+                <div id="magic-result" class="hidden mt-6 text-center border-t-2 border-dashed border-gray-200 pt-6">
+                    <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 inline-block min-w-[200px]">
+                        <div id="magic-hanzi" class="text-5xl sm:text-6xl font-extrabold text-gray-800 mb-2 chinese-font"></div>
+                        <div id="magic-pinyin" class="text-2xl sm:text-3xl text-indigo-600 font-bold pinyin-font"></div>
+                    </div>
+                    <p id="magic-english" class="text-lg sm:text-xl font-bold text-gray-600 mt-4"></p>
+                    <button onclick="speakMagic()" class="mt-4 px-6 py-2 bg-indigo-100 text-indigo-600 rounded-full font-bold">🔊 Listen</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="mt-8 text-yellow-600/60 font-bold text-xs cartoon-font mb-4">小盆友 © Powered by Google Gemini ✨  </footer>
+
+    <!-- DUAL PANDA MODAL -->
+    <div id="mouth-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4" onclick="closeModal()">
+        <div class="bg-green-50 rounded-3xl p-4 sm:p-8 max-w-3xl w-full shadow-2xl modal-enter border-4 border-green-400 relative flex flex-col items-center" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold">✕</button>
+            <h2 id="modal-char" class="text-8xl font-extrabold text-green-600 mb-6 pinyin-font">a</h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div class="flex flex-col items-center">
+                    <div class="panda-wrapper">
+                        <div class="ear left"></div><div class="ear right"></div>
+                        <div class="panda-face">
+                            <div class="eye left"></div><div class="eye right"></div>
+                            <div class="nose" id="main-nose"></div>
+                            <div id="main-mouth" class="mouth">
+                                <div id="main-tongue" class="tongue"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="font-bold text-gray-500 mt-2">Mouth Shape</p>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <div class="panda-wrapper" style="transform: scale(0.65); transform-origin: top center;">
+                        <div class="ear left"></div><div class="ear right"></div>
+                        <div class="paper-test" id="paper-test"></div> 
+                        <div class="panda-face">
+                            <div class="eye left"></div><div class="eye right"></div>
+                            <div class="nose"></div>
+                            <div id="mini-mouth" class="mouth">
+                                <div id="mini-tongue" class="tongue"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="font-bold text-gray-500 mt-[-60px]">Paper Test</p>
+                </div>
+            </div>
+
+            <p id="modal-desc" class="text-xl font-bold text-gray-700 mt-6 mb-6 text-center"></p>
+
+            <button id="modal-replay" class="w-full py-3 bg-green-500 text-white text-xl font-bold rounded-xl card-shadow hover:bg-green-600 flex items-center justify-center gap-2">
+               🔊 Listen Again
+            </button>
+        </div>
+    </div>
+
+    <!-- RULE MODAL -->
+    <div id="rule-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4" onclick="document.getElementById('rule-modal').classList.add('hidden')">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl modal-enter border-4 border-blue-200 relative" onclick="event.stopPropagation()">
+            <button onclick="document.getElementById('rule-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold">✕</button>
+            <h2 class="text-3xl font-extrabold text-blue-600 mb-4 text-center">Where does the hat go? 🧢</h2>
+            <div class="space-y-4 text-lg text-gray-700">
+                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <p class="font-bold text-blue-800 mb-1">1. Find 'a' First! 👑</p>
+                    <p class="text-sm">If you see <span class="font-bold text-xl pinyin-font">a</span>, put the hat on it!</p>
+                </div>
+                <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+                    <p class="font-bold text-green-800 mb-1">2. No 'a'? Find 'o' or 'e'! 🔍</p>
+                    <p class="text-sm">If there is no <span class="font-bold pinyin-font">a</span>, look for <span class="font-bold pinyin-font">o</span> or <span class="font-bold pinyin-font">e</span>.</p>
+                </div>
+                <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                    <p class="font-bold text-purple-800 mb-1">3. 'i' and 'u' Together 👯</p>
+                    <p class="text-sm">If <span class="font-bold pinyin-font">i</span> and <span class="font-bold pinyin-font">u</span> are side-by-side, the <b>last one</b> gets the hat!</p>
+                    <p class="text-xs text-purple-500 mt-1">Example: liú, duì</p>
+                </div>
+            </div>
+            <p class="text-center mt-6 text-gray-400 font-bold text-sm">"a o e, i u ü, Mark the tone in order!"</p>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "AIzaSyA0KRswtqnhmujbsabME2QZWdFCStzxakE"; 
+
+        // --- AUDIO SOURCES FOR TONES (MP3) ---
+        const toneAudioMap = {
+            'a': ["https://cdn.yoyochinese.com/audio/pychart/a1.mp3", "https://cdn.yoyochinese.com/audio/pychart/a2.mp3", "https://cdn.yoyochinese.com/audio/pychart/a3.mp3", "https://cdn.yoyochinese.com/audio/pychart/a4.mp3"],
+            'o': ["https://cdn.yoyochinese.com/audio/pychart/o1.mp3", "https://cdn.yoyochinese.com/audio/pychart/o2.mp3", "https://cdn.yoyochinese.com/audio/pychart/o3.mp3", "https://cdn.yoyochinese.com/audio/pychart/o4.mp3"],
+            'e': ["https://cdn.yoyochinese.com/audio/pychart/e1.mp3", "https://cdn.yoyochinese.com/audio/pychart/e2.mp3", "https://cdn.yoyochinese.com/audio/pychart/e3.mp3", "https://cdn.yoyochinese.com/audio/pychart/e4.mp3"],
+            'i': ["https://cdn.yoyochinese.com/audio/pychart/yi1.mp3", "https://cdn.yoyochinese.com/audio/pychart/yi2.mp3", "https://cdn.yoyochinese.com/audio/pychart/yi3.mp3", "https://cdn.yoyochinese.com/audio/pychart/yi4.mp3"],
+            'u': ["https://cdn.yoyochinese.com/audio/pychart/wu1.mp3", "https://cdn.yoyochinese.com/audio/pychart/wu2.mp3", "https://cdn.yoyochinese.com/audio/pychart/wu3.mp3", "https://cdn.yoyochinese.com/audio/pychart/wu4.mp3"],
+            'ü': ["https://cdn.yoyochinese.com/audio/pychart/yu1.mp3", "https://cdn.yoyochinese.com/audio/pychart/yu2.mp3", "https://cdn.yoyochinese.com/audio/pychart/yu3.mp3", "https://cdn.yoyochinese.com/audio/pychart/yu4.mp3"]
+        };
+
+        const toneVisuals = {
+            'a': ['ā', 'á', 'ǎ', 'à'],
+            'o': ['ō', 'ó', 'ǒ', 'ò'],
+            'e': ['ē', 'é', 'ě', 'è'],
+            'i': ['ī', 'í', 'ǐ', 'ì'],
+            'u': ['ū', 'ú', 'ǔ', 'ù'],
+            'ü': ['ǖ', 'ǘ', 'ǚ', 'ǜ']
+        };
+
+        let currentToneBase = 'a';
+
+        // --- PRONUNCIATION MAP ---
+        const pronunciationMap = {
+            'b': '波', 'p': '坡', 'm': '摸', 'f': '佛',
+            'd': '德', 't': '特', 'n': '讷', 'l': '勒',
+            'g': '哥', 'k': '科', 'h': '喝',
+            'j': '鸡', 'q': '七', 'x': '西',
+            'z': '资', 'c': '呲', 's': '丝',
+            'zh': '织', 'ch': '吃', 'sh': '狮', 'r': '日',
+            'y': '衣', 'w': '屋',
+            'a': '阿', 'o': '喔', 'e': '婀', 'i': '衣', 'u': '乌', 'ü': '迂'
+        };
+
+        const aspirated = ['p', 't', 'k', 'q', 'ch', 'c'];
+        const nasals = ['m', 'n', 'an', 'en', 'in', 'un', 'ün', 'ang', 'eng', 'ing', 'ong'];
+
+        const animData = {
+            'a': { mouth: 'anim-a', tongue: 'tongue-a', desc: "Open wide (Squarish)! Tongue low." },
+            'o': { mouth: 'anim-o', tongue: 'tongue-o', desc: "Round mouth. Tongue mid-high back." },
+            'e': { mouth: 'anim-e', tongue: 'tongue-e', desc: "Smile! Tongue mid-high back." },
+            'i': { mouth: 'anim-i', tongue: 'tongue-i', desc: "Teeth wide. Tongue high front!" },
+            'u': { mouth: 'anim-u', tongue: 'tongue-u', desc: "Round mouth. Tongue low." },
+            'ü': { mouth: 'anim-u', tongue: 'tongue-ü', desc: "Round lips. Tongue high front!" },
+            'w': { mouth: 'anim-u', tongue: 'tongue-u', desc: "Lips round (like u)!" },
+            'y': { mouth: 'anim-i', tongue: 'tongue-i', desc: "Lips spread (like i)!" },
+            'Lips': { mouth: 'anim-lips', tongue: '', desc: "Lips pop!" },
+            'Tip': { mouth: 'anim-open-slight', tongue: 'anim-tip', desc: "Tongue touches top!" },
+            'Root': { mouth: 'anim-open-slight', tongue: 'anim-back', desc: "Back of tongue up!" },
+            'Flat': { mouth: 'anim-e', tongue: '', desc: "Tongue flat behind teeth." },
+            'Rolled': { mouth: 'anim-open-slight', tongue: 'anim-curl', desc: "Tongue curls back!" },
+            'Special': { mouth: 'anim-e', tongue: '', desc: "Just sound!" }
+        };
+
+        const tongueVisuals = {
+            lips: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M30,40 Q50,35 70,40" fill="none" stroke="#EF4444" stroke-width="3" stroke-linecap="round"/><path d="M30,40 Q50,45 70,40" fill="none" stroke="#EF4444" stroke-width="3" stroke-linecap="round"/><text x="50" y="70" text-anchor="middle" font-size="10" fill="#666">Lips Move</text></svg>`,
+            tip: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M30,20 L30,40" stroke="#333" stroke-width="3"/><path d="M40,60 Q50,50 35,30" fill="none" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="#666">Tip touches teeth</text></svg>`,
+            root: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M20,60 Q50,60 60,30" fill="none" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="#666">Back of tongue up</text></svg>`,
+            flat: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M25,50 L75,50" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="70" text-anchor="middle" font-size="10" fill="#666">Tongue flat</text></svg>`,
+            rolled: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M30,60 Q50,50 45,25" fill="none" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="#666">Tongue curled back</text></svg>`
+        };
+
+        const initialsData = [
+            { name: "Lips (b p m f)", type: "Lips", icon: tongueVisuals.lips, color: "bg-pink-50 border-pink-200", chars: ['b','p','m','f'] },
+            { name: "Tongue Tip (d t n l)", type: "Tip", icon: tongueVisuals.tip, color: "bg-cyan-50 border-cyan-200", chars: ['d','t','n','l'] },
+            { name: "Tongue Root (g k h)", type: "Root", icon: tongueVisuals.root, color: "bg-lime-50 border-lime-200", chars: ['g','k','h'] },
+            { name: "Flat Tongue (z c s)", type: "Flat", icon: tongueVisuals.flat, color: "bg-indigo-50 border-indigo-200", chars: ['z','c','s'] },
+            { name: "Rolled (zh ch sh r)", type: "Rolled", icon: tongueVisuals.rolled, color: "bg-orange-50 border-orange-200", chars: ['zh','ch','sh','r'] },
+            { name: "Special (y w)", type: "Special", icon: tongueVisuals.lips, color: "bg-gray-50 border-gray-200", chars: ['y','w'] }
+        ];
+
+        let synth = window.speechSynthesis;
+        let voices = [];
+        let currentMagicWord = '';
+        let currentDrawWord = '';
+        let currentMode = 'word';
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let canvas, ctx;
+
+        window.onload = function() {
+            renderToneCards('a'); // Init with 'a'
+            renderFinals();
+            renderInitials();
+            loadVoices();
+            populateMagic();
+            initCanvas(); // Draw Logic
+            if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        function loadVoices() { voices = synth.getVoices(); }
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(e => e.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'draw') {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = '#333';
+            }
+        }
+
+        // --- NEW TONE RENDER LOGIC ---
+        function renderToneCards(base) {
+            currentToneBase = base;
+            const container = document.getElementById('tones-container');
+            const chars = toneVisuals[base];
+            
+            // Paths for the 4 tone curves
+            const paths = [
+                "M 10 25 L 90 25", // Flat
+                "M 10 40 L 90 10", // Rising
+                "M 10 20 L 50 45 L 90 10", // Down-Up
+                "M 10 10 L 90 40" // Falling
+            ];
+            
+            const descs = ["High Flat", "Rising", "Down & Up", "Falling"];
+            const colors = ["blue", "green", "purple", "red"];
+            const durations = ["2.5s", "2.5s", "4s", "1.5s"];
+
+            let html = '';
+            for(let i=0; i<4; i++) {
+                html += `
+                <div onclick="playToneAudio(${i+1})" class="bg-white p-4 rounded-2xl card-shadow border-b-4 border-${colors[i]}-200 cursor-pointer hover:bg-${colors[i]}-50 flex flex-col items-center">
+                    <span class="text-5xl font-bold text-${colors[i]}-500 pinyin-font">${chars[i]}</span>
+                    <div class="h-32 w-full rounded-lg flex items-center justify-center mt-4">
+                        <svg viewBox="0 0 100 50" class="w-full h-full overflow-visible">
+                            <path id="path${i}" d="${paths[i]}" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none" class="text-${colors[i]}-500"/>
+                            <text font-size="15" x="-8" y="5">🐼
+                                <animateMotion dur="${durations[i]}" repeatCount="indefinite" rotate="auto">
+                                    <mpath href="#path${i}"/>
+                                </animateMotion>
+                            </text>
+                        </svg>
+                    </div>
+                    <p class="font-bold text-gray-600 text-sm">${descs[i]}</p>
+                </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function playToneAudio(num) {
+            // Audio Logic: Get correct file from map based on current base + number
+            // Map structure: 'a': [a1, a2, a3, a4]
+            const list = toneAudioMap[currentToneBase];
+            if(list && list[num-1]) {
+                const audio = new Audio(list[num-1]);
+                audio.play().catch(e => console.log("Audio play failed", e));
+            }
+        }
+
+        function speak(text) {
+            if(synth.speaking) synth.cancel();
+            let textToSpeak = pronunciationMap[text] || text;
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            let voice = voices.find(v => v.lang === 'zh-CN') || voices.find(v => v.lang.includes('zh'));
+            if(voice) utterance.voice = voice;
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.6;
+            synth.speak(utterance);
+        }
+
+        function renderFinals() {
+            const finals = ['a','o','e','i','u','ü'];
+            document.getElementById('finals-grid').innerHTML = finals.map(char => `
+                <div onclick="openModal('${char}')" class="bg-green-50 border-b-4 border-green-300 p-6 rounded-2xl text-center cursor-pointer hover:bg-green-100 card-shadow transition transform hover:-translate-y-1">
+                    <div class="text-6xl font-bold text-green-600 mb-2 pinyin-font">${char}</div>
+                    <div class="text-xs text-gray-400 uppercase font-bold">Click Me</div>
+                </div>
+            `).join('');
+        }
+
+        function renderInitials() {
+            document.getElementById('initials-container').innerHTML = initialsData.map(g => `
+                <div class="bg-white rounded-2xl p-4 border-2 border-gray-100 flex flex-col sm:flex-row gap-4 items-center">
+                    <div class="w-24 h-24 flex-shrink-0 bg-gray-50 rounded-full border border-gray-200 p-1 relative">
+                        ${g.icon}
+                    </div>
+                    <div class="flex-grow w-full">
+                        <h3 class="font-bold text-gray-700 mb-3 px-2 border-l-4 border-purple-400 pl-2">${g.name}</h3>
+                        <div class="grid grid-cols-4 gap-2">
+                            ${g.chars.map(c => `
+                                <div onclick="openModal('${c}', '${g.type}')" class="${g.color} border-b-2 p-3 rounded-lg text-center cursor-pointer hover:brightness-95 active:scale-95 transition">
+                                    <span class="text-2xl font-extrabold text-gray-700 pinyin-font">${c}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- DUAL PANDA MODAL LOGIC ---
+        function openModal(char, type) {
+            let data = animData[char]; 
+            if(!data && type) data = animData[type];
+            if(!data) {
+                if(char === 'w') data = animData['w'];
+                else if(char === 'y') data = animData['y'];
+                else return;
+            }
+
+            document.getElementById('modal-char').innerText = char;
+            document.getElementById('modal-desc').innerText = data.desc;
+            
+            // Elements
+            const mainMouth = document.getElementById('main-mouth');
+            const mainTongue = document.getElementById('main-tongue');
+            const mainNose = document.getElementById('main-nose');
+            
+            const miniMouth = document.getElementById('mini-mouth');
+            const miniTongue = document.getElementById('mini-tongue');
+            const paper = document.getElementById('paper-test');
+            
+            // 1. CLEAR ALL PREVIOUS STATES
+            [mainMouth, miniMouth].forEach(m => m.className = 'mouth');
+            [mainTongue, miniTongue].forEach(t => t.className = 'tongue');
+            mainNose.classList.remove('vibrate');
+            paper.classList.remove('blow'); 
+            
+            // Force Reflow
+            void mainMouth.offsetWidth;
+            void paper.offsetWidth; 
+            
+            // 2. APPLY BASE CLASSES
+            [mainMouth, miniMouth].forEach(m => m.classList.add(data.mouth));
+            if(data.tongue) {
+                [mainTongue, miniTongue].forEach(t => t.classList.add(data.tongue));
+            }
+            
+            // 3. SHOW MODAL
+            document.getElementById('mouth-modal').classList.remove('hidden');
+            
+            // 4. TRIGGER ANIMATIONS (Infinite Loop logic)
+            setTimeout(() => {
+                if (aspirated.includes(char)) {
+                    paper.classList.add('blow'); // Infinite animation defined in CSS
+                }
+                if (nasals.includes(char)) {
+                    mainNose.classList.add('vibrate');
+                }
+                speak(char);
+            }, 50); 
+            
+            // 5. SETUP REPLAY
+            document.getElementById('modal-replay').onclick = () => {
+                speak(char);
+                // No need to reset 'blow' class as it is infinite loop now
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('mouth-modal').classList.add('hidden');
+            if(synth.speaking) synth.cancel();
+        }
+
+        // --- DRAWING LOGIC ---
+        function initCanvas() {
+            canvas = document.getElementById('drawing-board');
+            ctx = canvas.getContext('2d');
+            
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault(); 
+                startDrawing(e.touches[0]);
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                draw(e.touches[0]);
+            });
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            document.getElementById('draw-placeholder').classList.add('hidden');
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            lastX = x;
+            lastY = y;
+        }
+
+        function stopDrawing() { isDrawing = false; }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('draw-placeholder').classList.remove('hidden');
+            document.getElementById('draw-result').classList.add('hidden');
+        }
+
+        async function guessDrawing() {
+            const btn = document.getElementById('btn-guess');
+            const loading = document.getElementById('draw-loading');
+            const result = document.getElementById('draw-result');
+            const base64 = canvas.toDataURL("image/png").split(',')[1];
+            
+            btn.disabled = true;
+            loading.classList.remove('hidden');
+            result.classList.add('hidden');
+
+            const prompt = `Identify the single main object in this child's drawing. Return JSON: {"hanzi": "Word", "pinyin": "Pinyin", "english": "Name"}. If unclear, return null.`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        contents: [{
+                            role: "user",
+                            parts: [
+                                { text: prompt },
+                                { inlineData: { mimeType: "image/png", data: base64 } }
+                            ]
+                        }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+                
+                const data = await response.json();
+                const res = JSON.parse(data.candidates[0].content.parts[0].text);
+                
+                if (res && res.hanzi) {
+                    document.getElementById('draw-hanzi').innerText = res.hanzi;
+                    document.getElementById('draw-pinyin').innerText = res.pinyin;
+                    document.getElementById('draw-english').innerText = res.english;
+                    currentDrawWord = res.hanzi;
+                    result.classList.remove('hidden');
+                    speakDrawResult();
+                } else {
+                    alert("Panda is confused! Try drawing again.");
+                }
+
+            } catch(e) { console.error(e); } 
+            finally {
+                loading.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+
+        function speakDrawResult() {
+            if(currentDrawWord) {
+                const u = new SpeechSynthesisUtterance(currentDrawWord);
+                u.lang = 'zh-CN';
+                u.rate = 0.8;
+                synth.speak(u);
+            }
+        }
+
+        // --- MAGIC LOGIC ---
+        function populateMagic() {
+            const allInit = initialsData.flatMap(g => g.chars);
+            document.getElementById('magic-initial').innerHTML = allInit.map(i => `<option value="${i}">${i}</option>`).join('');
+            document.getElementById('magic-final').innerHTML = ['a','o','e','i','u','ü'].map(f => `<option value="${f}">${f}</option>`).join('');
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            const btnWord = document.getElementById('btn-word');
+            const btnSentence = document.getElementById('btn-sentence');
+            const btnMain = document.getElementById('btn-text');
+            if(mode === 'word') {
+                btnWord.className = "px-4 py-2 rounded-full bg-indigo-500 text-white font-bold transition";
+                btnSentence.className = "px-4 py-2 rounded-full bg-gray-200 text-gray-600 font-bold transition";
+                btnMain.innerText = "Make Word ✨";
+            } else {
+                btnWord.className = "px-4 py-2 rounded-full bg-gray-200 text-gray-600 font-bold transition";
+                btnSentence.className = "px-4 py-2 rounded-full bg-indigo-500 text-white font-bold transition";
+                btnMain.innerText = "Make Funny Sentence ✨";
+            }
+        }
+
+        async function generateMagic() {
+            const ini = document.getElementById('magic-initial').value;
+            const fin = document.getElementById('magic-final').value;
+            const btn = document.getElementById('magic-btn');
+            
+            btn.disabled = true;
+            document.getElementById('magic-loading').classList.remove('hidden');
+            document.getElementById('magic-result').classList.add('hidden');
+
+            let prompt = "";
+            if (currentMode === 'word') {
+                prompt = `Create a simple Chinese word (P1 level) using Pinyin Initial "${ini}" and Final "${fin}". Return JSON: {"hanzi": "word", "pinyin": "pinyin", "english": "meaning"}`;
+            } else {
+                prompt = `Create a cute Chinese sentence (max 10 chars) using pinyin "${ini}" or "${fin}". Return JSON: {"hanzi": "sentence", "pinyin": "full pinyin", "english": "meaning"}`;
+            }
+            
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+                const data = await response.json();
+                const res = JSON.parse(data.candidates[0].content.parts[0].text);
+                
+                document.getElementById('magic-hanzi').innerText = res.hanzi;
+                document.getElementById('magic-pinyin').innerText = res.pinyin;
+                document.getElementById('magic-english').innerText = res.english;
+                currentMagicWord = res.hanzi;
+                
+                document.getElementById('magic-loading').classList.add('hidden');
+                document.getElementById('magic-result').classList.remove('hidden');
+            } catch(e) {
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        function speakMagic() { if(currentMagicWord) speak(currentMagicWord); }
+    </script>
+</body>
+</html>
