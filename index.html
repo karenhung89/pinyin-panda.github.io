@@ -181,7 +181,6 @@
         pointer-events: none;
     }
     
-    /* Infinite Flap for Aspirated Sounds */
     .paper-test.blow {
         animation: blow-paper-loop 1s infinite;
     }
@@ -239,6 +238,12 @@
 
     .tongue.anim-back { animation: tongue-back 1s infinite; }
     @keyframes tongue-back { 0%, 100% { width: 16px; bottom:-10px; } 50% { width: 24px; bottom: -2px; } }
+
+    .tongue.anim-surface { animation: tongue-surface 1s infinite; }
+    @keyframes tongue-surface {
+        0%, 100% { bottom: -10px; height: 15px; border-radius: 10px; }
+        50% { bottom: 5px; height: 25px; border-radius: 50% 50% 0 0; }
+    }
 
     /* Modal */
     .modal-enter { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -336,7 +341,6 @@
                 <!-- Video 1 -->
                 <div class="bg-white p-4 rounded-3xl shadow-lg border-4 border-pink-200">
                     <div class="mb-4 rounded-xl overflow-hidden bg-black h-64">
-                        <!-- Placeholder ID: You can swap 'b9AyvjQCN7A' with any ID -->
                         <iframe class="w-full h-full" src="https://www.youtube.com/embed/b9AyvjQCN7A" title="Pinyin Song" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
                     <h3 class="font-bold text-gray-700 text-center">Pinyin Song (bpmf)</h3>
@@ -447,16 +451,18 @@
 
         let currentToneBase = 'a';
 
-        // --- PRONUNCIATION MAP ---
+        // --- PRONUNCIATION MAP (Strict 1st Tone) ---
         const pronunciationMap = {
-            'b': '波', 'p': '坡', 'm': '摸', 'f': '佛',
-            'd': '德', 't': '特', 'n': '讷', 'l': '勒',
-            'g': '哥', 'k': '科', 'h': '喝',
-            'j': '鸡', 'q': '七', 'x': '西',
-            'z': '资', 'c': '呲', 's': '丝',
-            'zh': '织', 'ch': '吃', 'sh': '狮', 'r': '日',
-            'y': '衣', 'w': '屋',
-            'a': '阿', 'o': '喔', 'e': '婀', 'i': '衣', 'u': '乌', 'ü': '迂'
+            'b': 'bō', 'p': 'pō', 'm': 'mō', 'f': 'fō',
+            'd': 'dē', 't': 'tē', 'n': 'nē', 'l': 'lē',
+            'g': 'gē', 'k': 'kē', 'h': 'hē',
+            'j': 'jī', 'q': 'qī', 'x': 'xī',
+            'z': 'zī', 'c': 'cī', 's': 'sī',
+            'zh': 'zhī', 'ch': 'chī', 'sh': 'shī', 'r': 'rī',
+            'y': 'yī', 'w': 'wū',
+            'a': 'ā', 'o': 'ō', 'e': 'ē', 
+            // Fixed mapping for i, u, ü to ensure they are spoken
+            'i': 'yī', 'u': 'wū', 'ü': 'yū' 
         };
 
         const aspirated = ['p', 't', 'k', 'q', 'ch', 'c'];
@@ -474,6 +480,7 @@
             'Lips': { mouth: 'anim-lips', tongue: '', desc: "Lips pop!" },
             'Tip': { mouth: 'anim-open-slight', tongue: 'anim-tip', desc: "Tongue touches top!" },
             'Root': { mouth: 'anim-open-slight', tongue: 'anim-back', desc: "Back of tongue up!" },
+            'Surface': { mouth: 'anim-i', tongue: 'anim-surface', desc: "Tongue flat, high!" }, 
             'Flat': { mouth: 'anim-e', tongue: '', desc: "Tongue flat behind teeth." },
             'Rolled': { mouth: 'anim-open-slight', tongue: 'anim-curl', desc: "Tongue curls back!" },
             'Special': { mouth: 'anim-e', tongue: '', desc: "Just sound!" }
@@ -484,13 +491,15 @@
             tip: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M30,20 L30,40" stroke="#333" stroke-width="3"/><path d="M40,60 Q50,50 35,30" fill="none" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="#666">Tip touches teeth</text></svg>`,
             root: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M20,60 Q50,60 60,30" fill="none" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="#666">Back of tongue up</text></svg>`,
             flat: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M25,50 L75,50" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="70" text-anchor="middle" font-size="10" fill="#666">Tongue flat</text></svg>`,
-            rolled: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M30,60 Q50,50 45,25" fill="none" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="#666">Tongue curled back</text></svg>`
+            rolled: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M30,60 Q50,50 45,25" fill="none" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="#666">Tongue curled back</text></svg>`,
+            surface: `<svg viewBox="0 0 100 80" class="w-full h-full"><path d="M20,60 Q50,30 80,60" fill="none" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><text x="50" y="75" text-anchor="middle" font-size="10" fill="#666">Tongue High Flat</text></svg>`
         };
 
         const initialsData = [
             { name: "Lips (b p m f)", type: "Lips", icon: tongueVisuals.lips, color: "bg-pink-50 border-pink-200", chars: ['b','p','m','f'] },
             { name: "Tongue Tip (d t n l)", type: "Tip", icon: tongueVisuals.tip, color: "bg-cyan-50 border-cyan-200", chars: ['d','t','n','l'] },
             { name: "Tongue Root (g k h)", type: "Root", icon: tongueVisuals.root, color: "bg-lime-50 border-lime-200", chars: ['g','k','h'] },
+            { name: "Tongue Surface (j q x)", type: "Surface", icon: tongueVisuals.surface, color: "bg-yellow-50 border-yellow-200", chars: ['j','q','x'] },
             { name: "Flat Tongue (z c s)", type: "Flat", icon: tongueVisuals.flat, color: "bg-indigo-50 border-indigo-200", chars: ['z','c','s'] },
             { name: "Rolled (zh ch sh r)", type: "Rolled", icon: tongueVisuals.rolled, color: "bg-orange-50 border-orange-200", chars: ['zh','ch','sh','r'] },
             { name: "Special (y w)", type: "Special", icon: tongueVisuals.lips, color: "bg-gray-50 border-gray-200", chars: ['y','w'] }
@@ -500,7 +509,7 @@
         let voices = [];
 
         window.onload = function() {
-            renderToneCards('a'); // Init with 'a'
+            renderToneCards('a'); 
             renderFinals();
             renderInitials();
             loadVoices();
@@ -519,7 +528,6 @@
             const container = document.getElementById('tones-container');
             const chars = toneVisuals[base];
             
-            // Paths for the 4 tone curves
             const paths = [
                 "M 10 25 L 90 25", // Flat
                 "M 10 40 L 90 10", // Rising
@@ -646,7 +654,7 @@
             // 4. TRIGGER ANIMATIONS (Infinite Loop logic)
             setTimeout(() => {
                 if (aspirated.includes(char)) {
-                    paper.classList.add('blow'); // Infinite animation defined in CSS
+                    paper.classList.add('blow');
                 }
                 if (nasals.includes(char)) {
                     mainNose.classList.add('vibrate');
@@ -657,7 +665,6 @@
             // 5. SETUP REPLAY
             document.getElementById('modal-replay').onclick = () => {
                 speak(char);
-                // No need to reset 'blow' class as it is infinite loop now
             };
         }
 
